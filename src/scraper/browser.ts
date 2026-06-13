@@ -4,7 +4,7 @@ import puppeteer, {
   type Browser,
   type BrowserContext,
   type LaunchOptions,
-} from "puppeteer";
+} from "puppeteer-core";
 import { createLogger } from "../utils/logger.js";
 import {
   runInLoggerContext,
@@ -26,6 +26,15 @@ export const browserExecutablePath =
 const logger = createLogger("browser");
 
 export async function createBrowser(): Promise<Browser> {
+  const browserlessUrl = process.env.BROWSERLESS_URL;
+  
+  if (browserlessUrl) {
+    logger("Connecting to Browserless", { browserlessUrl });
+    return puppeteer.connect({
+      browserWSEndpoint: browserlessUrl,
+    });
+  }
+  
   const options = {
     args: browserArgs,
     executablePath: browserExecutablePath,
